@@ -1,0 +1,9 @@
+./.idea
+config/config.json
+**/node_modules
+
+.idea/
+
+tools/constants.js
+
+package-lock.json
