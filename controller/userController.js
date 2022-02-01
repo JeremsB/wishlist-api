@@ -9,7 +9,7 @@ module.exports = {
         let current = req.params.current
         try {
             const userCollection = await User.findAll({
-                attributes: ['name'],
+                attributes: ['id','name'],
                 include: {
                     attributes: ['id','label', 'url', 'description', 'bought'],
                     model: Present, as: "presents"
@@ -20,8 +20,8 @@ module.exports = {
                     }
                 }
             })
-            //res.status(201).send(userCollection)
-            res.send(req.user)
+            res.status(201).send(userCollection)
+            //res.send(req.user)
         } catch (e) {
             console.log(e)
             res.status(500).send(e)
@@ -48,7 +48,7 @@ module.exports = {
     },
     async login(req, res) {
         try {
-            let { login, password } = req.body;
+            let {login, password} = req.body;
             //if (login == null || password == null) throw new WsException(40000);
 
             let user = await User.findOne({
@@ -58,23 +58,22 @@ module.exports = {
                     password: password
                 }
             });
-            if (user === null) res.status(401).send('Invalid Credentials');
+            if (user === null) {
+                res.status(401).send('Invalid Credentials');
+            } else {
+                let token = jwt.sign(
+                    {
+                        utilisateur_id: user.id,
+                        utilisateur_login: user.login,
+                    },
+                    CONSTANTS["TOKEN_KEY"]
+                );
 
-            let token = jwt.sign(
-        {
-                    utilisateur_id: user.id,
-                    utilisateur_login: user.login,
-                    //on expire depuis le front au bout de 30min d'inactivité
-                },
-                CONSTANTS["TOKEN_KEY"]
-            );
-            //let refreshToken = jwt.sign({ login: utilisateur.login, refreshKey: utilisateur.refresh_key }, CONSTANTE["TOKEN_KEY"]);
-
-            res.send({
-                token: token,
-                user: user
-               // refreshToken: refreshToken,
-            });
+                res.send({
+                    token: token,
+                    user: user
+                });
+            }
         } catch (e) {
             console.log(e)
             res.status(500).send(e)

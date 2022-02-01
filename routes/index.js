@@ -4,15 +4,15 @@ const eventController = require("../controller/eventController");
 const authMiddleware = require("../middleware/authMiddleware");
 module.exports = app => {
     app.get("/others/:current", authMiddleware.authenticateToken(), userController.getOtherUsers)
-    app.get("/user/:id", userController.getUserById)
+    app.get("/user/:id", authMiddleware.authenticateToken(), userController.getUserById)
     app.post("/auth/login", userController.login)
 
-    app.get("/presents/user/:id", presentController.getPresentsByUser)
-    app.get("/present/:id", presentController.getPresentById)
-    app.get("/present/self/:id", presentController.getSelfPresentById)
-    app.post("/present", presentController.createPresent)
+    app.get("/presents/user/:id", authMiddleware.authenticateToken(), presentController.getPresentsByUser)
+    app.get("/present/:id", authMiddleware.authenticateToken(), presentController.getPresentById)
+    app.get("/present/self/:id", authMiddleware.authenticateToken(), presentController.getSelfPresentById)
+    app.post("/present", authMiddleware.authenticateToken(), presentController.createPresent)
 
-    app.get("/events", eventController.getActiveEvents)
+    app.get("/events", authMiddleware.authenticateToken(), eventController.getActiveEvents)
     /*app.get("/game/category/:id", gameController.getAllGamesByCategory)
     app.get("/game/console/:id", gameController.getAllGamesByConsole)
 
